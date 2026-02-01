@@ -16,13 +16,13 @@ public class InvoiceInfo {
     @Description("开票日期，格式 yyyy-MM-dd")
     public String invoiceDate;
 
-    @Description("开票方名称")
+    @Description("购买方信息，对应的名称")
     public String sellerName;
 
-    @Description("含税总金额，单位人民币元")
+    @Description("找到价税合计（大写） 在右边的找对应的小写")
     @NotNull
     public BigDecimal totalAmount;
 
-    @Description("税率，例如 0.13")
+    @Description("税率/征收税，例如 6%")
     public BigDecimal taxRate;
 }

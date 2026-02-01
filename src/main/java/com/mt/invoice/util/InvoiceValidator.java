@@ -6,6 +6,7 @@ import com.mt.invoice.model.InvoiceInfo;
 public class InvoiceValidator {
 
     public static void validate(InvoiceInfo info) {
+
         if (info.invoiceNo == null || info.invoiceNo.isBlank()) {
             throw new IllegalArgumentException("发票号码缺失，需要人工复核");
         }
