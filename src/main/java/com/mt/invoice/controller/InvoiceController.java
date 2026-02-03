@@ -21,6 +21,7 @@ public class InvoiceController {
 
     @PostMapping("/parse")
     public InvoiceInfo parse(@RequestBody String text) {
-        return invoiceService.parseInvoice("https://dppt.shenzhen.chinatax.gov.cn:8443/kpfw/fpjfzz/v1/exportDzfpwjEwm?Wjgs=pdf&Jym=E095&Fphm=26952000000416516581&Kprq=20260201103302&Czsj=1769913182598");
+
+        return invoiceService.parseInvoice("http://cyyzerp.cysignet.com/17701006395480078.pdf");
     }
 }

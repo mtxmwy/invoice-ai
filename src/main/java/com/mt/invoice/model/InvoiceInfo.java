@@ -17,12 +17,21 @@ public class InvoiceInfo {
     public String invoiceDate;
 
     @Description("购买方信息，对应的名称")
-    public String sellerName;
+    public String buyerName;
+
+
+
+    @Description("税率/征收税，例如 6%")
+    public BigDecimal taxRate;
+
+    @Description("税额")
+    public BigDecimal taxAmount;
+
+    @Description("金额")
+    public BigDecimal amount;
+
 
     @Description("找到价税合计（大写） 在右边的找对应的小写")
     @NotNull
     public BigDecimal totalAmount;
-
-    @Description("税率/征收税，例如 6%")
-    public BigDecimal taxRate;
 }

@@ -1,6 +1,8 @@
 package com.mt.invoice.config;
 
+import com.mt.invoice.agent.InvoiceDecisionTools;
 import com.mt.invoice.ai.InvoiceAiService;
+import com.mt.invoice.ai.InvoiceDecisionAgent;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.service.AiServices;
 import jakarta.annotation.Resource;
@@ -20,6 +22,17 @@ public class AiCodeHelperServiceFactory {
     @Bean
     public InvoiceAiService aiCodeHelperServiceimpl() {
         return AiServices.create(InvoiceAiService.class, qwenChatModel);
+    }
+
+
+    @Bean
+    public InvoiceDecisionAgent invoiceDecisionServiceimpl() {
+        InvoiceDecisionAgent agent = AiServices.builder(InvoiceDecisionAgent.class)
+                .chatModel(qwenChatModel)
+                // 注意：Qwen3-VL-Plus等多模态模型目前不支持工具，所以不添加.tools()参数
+              //  .tools(new InvoiceDecisionTools())
+                .build();
+        return agent;
     }
 }
 
