@@ -6,8 +6,10 @@ import com.mt.invoice.ai.InvoiceAiService;
 import com.mt.invoice.ai.InvoiceDecisionAgent;
 import com.mt.invoice.model.InvoiceDecisionResult;
 import com.mt.invoice.model.InvoiceInfo;
+import com.mt.invoice.model.InvoiceMemory;
 import com.mt.invoice.util.FileDownloader;
 import com.mt.invoice.util.InvoiceValidator;
+import dev.langchain4j.community.model.dashscope.QwenEmbeddingModel;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentLoader;
 import dev.langchain4j.data.document.DocumentParser;
@@ -16,6 +18,7 @@ import dev.langchain4j.data.message.ImageContent;
 import dev.langchain4j.data.message.PdfFileContent;
 import dev.langchain4j.data.message.TextContent;
 import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.model.embedding.EmbeddingModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayInputStream;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -38,6 +42,14 @@ public class InvoiceService {
     @Autowired
     private FileDownloader fileDownloader;
 
+    @Autowired
+    private QwenEmbeddingModel embeddingModel;
+
+    @Autowired
+    private InvoiceMemoryRepository invoiceMemoryRepository;
+
+
+
 
 
 
@@ -49,10 +61,17 @@ public class InvoiceService {
         DocumentParser parser = new ApachePdfBoxDocumentParser();
         Document document = parser.parse(new ByteArrayInputStream(fileBytes));
 
+        log.info("提取前内容为：{}", document.text());
 
+        // 1. 生成向量
+        float[] queryVector = embed(document.text());
+
+        // 2. 查历史案例
+        List<InvoiceMemory> memories =
+                invoiceMemoryRepository.search(queryVector, 3);
         // 第一次提取，使用基础版本的extract方法，不需要反馈
         InvoiceInfo info = aiService.extract(document.text());
-        log.info("解析内容为：{}", JSONObject.toJSONString(info));
+        log.info("提取后内容为：{}", JSONObject.toJSONString(info));
         
         // 处理AI决策结果
         InvoiceDecisionResult decisionResult = decisionAgent.decide(JSONObject.toJSONString(info),new Date());
@@ -77,5 +96,9 @@ public class InvoiceService {
         InvoiceValidator.validate(info);
 
         return info;
+    }
+
+    public float[] embed(String text) {
+        return embeddingModel.embed(text).content().vector();
     }
 }
